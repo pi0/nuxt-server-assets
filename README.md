@@ -1,5 +1,8 @@
 # Nuxt server files
 
+> [!NOTE]
+> Examples in this guide are tailored for using with Vercel functions.
+
 ## Using server assets
 
 You can use [server assets](https://nitro.unjs.io/guide/assets#server-assets) to include files into the production bundle.
@@ -103,3 +106,30 @@ export default defineNuxtConfig({
 > Nitro by default treeshakes dependencies and only includes **used** files from `node_modules` so normally you don't need to manually exclude files from tracing.
 
 
+## Writing files
+
+You can mount a [KV storage](https://nitro.unjs.io/guide/storage) using [Vercel KV](https://unstorage.unjs.io/drivers/vercel) driver to have read/write access to server files.
+
+```js
+export default defineNuxtConfig({
+  $production: {
+    nitro: {
+      storage: {
+        data: { driver: 'vercelKV' }
+      }
+    }
+  }
+})
+```
+
+**Example:**
+
+```js
+export default defineEventHandler(async (event) => {
+  const dataStorage = useStorage("data");
+  await dataStorage.setItem("hello", "world");
+  return {
+    hello: await dataStorage.getItem("hello"),
+  };
+});
+```
